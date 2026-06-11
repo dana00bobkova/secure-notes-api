@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Secure Notes API local files
+secure_notes.db
+secure_notes.db-journal
+test_secure_notes.db
+test_secure_notes.db-journal
+reports/
