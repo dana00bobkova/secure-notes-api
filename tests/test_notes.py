@@ -169,21 +169,74 @@ def test_user_cannot_read_another_users_note(client, auth_headers):
 
     dana_note_id = dana_note_response.json()["id"]
 
-    client.post(
+    bob_email = "bob-read-unique@example.com"
+
+    bob_register_response = client.post(
         "/auth/register",
         json={
-            "email": "bob@example.com",
+            "email": bob_email,
             "password": "Password123!"
         }
     )
 
+    assert bob_register_response.status_code == 201
+
     bob_login_response = client.post(
         "/auth/login",
         json={
-            "email": "bob@example.com",
+            "email": bob_email,
             "password": "Password123!"
         }
     )
+
+    assert bob_login_response.status_code == 200
+
+    bob_headers = {
+        "Authorization": f"Bearer {bob_login_response.json()['access_token']}"
+    }
+
+    bob_read_response = client.get(
+        f"/notes/{dana_note_id}",
+        headers=bob_headers
+    )
+
+    assert bob_read_response.status_code == 404
+    assert bob_read_response.json()["detail"] == "Note not found."
+
+
+def test_user_cannot_read_another_users_note(client, auth_headers):
+    dana_note_response = client.post(
+        "/notes/",
+        json={
+            "title": "Dana Private Note",
+            "content": "Bob should not be able to read this."
+        },
+        headers=auth_headers
+    )
+
+    dana_note_id = dana_note_response.json()["id"]
+
+    bob_email = "bob-read-unique@example.com"
+
+    bob_register_response = client.post(
+        "/auth/register",
+        json={
+            "email": bob_email,
+            "password": "Password123!"
+        }
+    )
+
+    assert bob_register_response.status_code == 201
+
+    bob_login_response = client.post(
+        "/auth/login",
+        json={
+            "email": bob_email,
+            "password": "Password123!"
+        }
+    )
+
+    assert bob_login_response.status_code == 200
 
     bob_headers = {
         "Authorization": f"Bearer {bob_login_response.json()['access_token']}"
@@ -210,21 +263,27 @@ def test_user_cannot_update_another_users_note(client, auth_headers):
 
     dana_note_id = dana_note_response.json()["id"]
 
-    client.post(
+    bob_email = "bob-update-unique@example.com"
+
+    bob_register_response = client.post(
         "/auth/register",
         json={
-            "email": "bob-update@example.com",
+            "email": bob_email,
             "password": "Password123!"
         }
     )
 
+    assert bob_register_response.status_code == 201
+
     bob_login_response = client.post(
         "/auth/login",
         json={
-            "email": "bob-update@example.com",
+            "email": bob_email,
             "password": "Password123!"
         }
     )
+
+    assert bob_login_response.status_code == 200
 
     bob_headers = {
         "Authorization": f"Bearer {bob_login_response.json()['access_token']}"
@@ -255,21 +314,27 @@ def test_user_cannot_delete_another_users_note(client, auth_headers):
 
     dana_note_id = dana_note_response.json()["id"]
 
-    client.post(
+    bob_email = "bob-delete-unique@example.com"
+
+    bob_register_response = client.post(
         "/auth/register",
         json={
-            "email": "bob-delete@example.com",
+            "email": bob_email,
             "password": "Password123!"
         }
     )
 
+    assert bob_register_response.status_code == 201
+
     bob_login_response = client.post(
         "/auth/login",
         json={
-            "email": "bob-delete@example.com",
+            "email": bob_email,
             "password": "Password123!"
         }
     )
+
+    assert bob_login_response.status_code == 200
 
     bob_headers = {
         "Authorization": f"Bearer {bob_login_response.json()['access_token']}"

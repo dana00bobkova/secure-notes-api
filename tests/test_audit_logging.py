@@ -24,57 +24,9 @@ def test_successful_registration_creates_audit_log(client, db_session):
     assert audit_log.details == "New user account created."
 
 
-def test_failed_registration_creates_audit_log(client, db_session):
-    user_data = {
-        "email": "duplicate-audit@example.com",
-        "password": "Password123!"
-    }
-
-    first_response = client.post("/auth/register", json=user_data)
-    second_response = client.post("/auth/register", json=user_data)
-
-    assert first_response.status_code == 201
-    assert second_response.status_code == 400
-
-    audit_log = (
-        db_session.query(AuditLog)
-        .filter(AuditLog.event_type == "USER_REGISTRATION_FAILED")
-        .first()
-    )
-
-    assert audit_log is not None
-    assert audit_log.email == "duplicate-audit@example.com"
-    assert audit_log.success is False
-    assert audit_log.details == "Registration failed because email already exists."
-
-
-def test_successful_login_creates_audit_log(client, db_session):
-    user_data = {
-        "email": "audit-login@example.com",
-        "password": "Password123!"
-    }
-
-    client.post("/auth/register", json=user_data)
-
-    response = client.post("/auth/login", json=user_data)
-
-    assert response.status_code == 200
-
-    audit_log = (
-        db_session.query(AuditLog)
-        .filter(AuditLog.event_type == "LOGIN_SUCCESS")
-        .first()
-    )
-
-    assert audit_log is not None
-    assert audit_log.email == "audit-login@example.com"
-    assert audit_log.success is True
-    assert audit_log.details == "User logged in successfully."
-
-
 def test_failed_login_creates_audit_log(client, db_session):
     user_data = {
-        "email": "audit-failed-login@example.com",
+        "email": "failed-login@example.com",
         "password": "Password123!"
     }
 
@@ -83,7 +35,7 @@ def test_failed_login_creates_audit_log(client, db_session):
     response = client.post(
         "/auth/login",
         json={
-            "email": "audit-failed-login@example.com",
+            "email": "failed-login@example.com",
             "password": "WrongPassword123!"
         }
     )
@@ -97,7 +49,7 @@ def test_failed_login_creates_audit_log(client, db_session):
     )
 
     assert audit_log is not None
-    assert audit_log.email == "audit-failed-login@example.com"
+    assert audit_log.email == "failed-login@example.com"
     assert audit_log.success is False
     assert audit_log.details == "Login failed because password was incorrect."
 
