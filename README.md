@@ -1,1 +1,5 @@
-# secure-notes-api
+![CI Security Checks](https://github.com/dana00bobkova/secure-notes-api/actions/workflows/ci.yml/badge.svg)
+![CodeQL Security Scan](https://github.com/dana00bobkova/secure-notes-api/actions/workflows/codeql.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.13-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-Secure%20API-green)
+![Security](https://img.shields.io/badge/Security-DevSecOps%20Project-purple)
