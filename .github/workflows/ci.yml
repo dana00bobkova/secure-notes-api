@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       SECRET_KEY: test-secret-key-for-ci-only
       DATABASE_URL: sqlite:///./secure_notes.db
       ALGORITHM: HS256
@@ -41,8 +42,8 @@ jobs:
 
       - name: Run Bandit security scan
         run: |
-          bandit -r app || true
+          bandit -r app
 
       - name: Run pip-audit dependency scan
         run: |
-          pip-audit -r requirements.txt || true
+          pip-audit -r requirements.txt
