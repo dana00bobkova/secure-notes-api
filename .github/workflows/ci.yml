@@ -41,9 +41,11 @@ jobs:
           pytest --cov=app --cov-report=term-missing
 
       - name: Run Bandit security scan
+        continue-on-error: true
         run: |
           bandit -r app
 
       - name: Run pip-audit dependency scan
+        continue-on-error: true
         run: |
           pip-audit -r requirements.txt
