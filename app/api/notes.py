@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
 from app.database import get_db
 from app.models import Note, User
 from app.schemas import NoteCreate, NoteRead, NoteUpdate
+from app.services.audit_logger import log_audit_event
 
 notes_router = APIRouter()
 
@@ -16,6 +17,7 @@ notes_router = APIRouter()
 )
 def create_note(
     note_data: NoteCreate,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -29,6 +31,16 @@ def create_note(
     db.commit()
     db.refresh(new_note)
 
+    log_audit_event(
+        db=db,
+        event_type="NOTE_CREATED",
+        success=True,
+        request=request,
+        user_id=current_user.id,
+        email=current_user.email,
+        details=f"Note created with note_id={new_note.id}."
+    )
+
     return new_note
 
 
@@ -37,7 +49,11 @@ def list_notes(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    notes = db.query(Note).filter(Note.owner_id == current_user.id).all()
+    notes = (
+        db.query(Note)
+        .filter(Note.owner_id == current_user.id)
+        .all()
+    )
 
     return notes
 
@@ -45,6 +61,7 @@ def list_notes(
 @notes_router.get("/{note_id}", response_model=NoteRead)
 def read_note(
     note_id: int,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -55,6 +72,16 @@ def read_note(
     )
 
     if note is None:
+        log_audit_event(
+            db=db,
+            event_type="UNAUTHORIZED_OR_MISSING_NOTE_READ",
+            success=False,
+            request=request,
+            user_id=current_user.id,
+            email=current_user.email,
+            details=f"User tried to read note_id={note_id}, but it was missing or not owned by the user."
+        )
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Note not found."
@@ -67,6 +94,7 @@ def read_note(
 def update_note(
     note_id: int,
     note_data: NoteUpdate,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -77,6 +105,16 @@ def update_note(
     )
 
     if note is None:
+        log_audit_event(
+            db=db,
+            event_type="UNAUTHORIZED_OR_MISSING_NOTE_UPDATE",
+            success=False,
+            request=request,
+            user_id=current_user.id,
+            email=current_user.email,
+            details=f"User tried to update note_id={note_id}, but it was missing or not owned by the user."
+        )
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Note not found."
@@ -90,6 +128,16 @@ def update_note(
     db.commit()
     db.refresh(note)
 
+    log_audit_event(
+        db=db,
+        event_type="NOTE_UPDATED",
+        success=True,
+        request=request,
+        user_id=current_user.id,
+        email=current_user.email,
+        details=f"Note updated with note_id={note.id}."
+    )
+
     return note
 
 
@@ -99,6 +147,7 @@ def update_note(
 )
 def delete_note(
     note_id: int,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -109,6 +158,16 @@ def delete_note(
     )
 
     if note is None:
+        log_audit_event(
+            db=db,
+            event_type="UNAUTHORIZED_OR_MISSING_NOTE_DELETE",
+            success=False,
+            request=request,
+            user_id=current_user.id,
+            email=current_user.email,
+            details=f"User tried to delete note_id={note_id}, but it was missing or not owned by the user."
+        )
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Note not found."
@@ -116,5 +175,15 @@ def delete_note(
 
     db.delete(note)
     db.commit()
+
+    log_audit_event(
+        db=db,
+        event_type="NOTE_DELETED",
+        success=True,
+        request=request,
+        user_id=current_user.id,
+        email=current_user.email,
+        details=f"Note deleted with note_id={note_id}."
+    )
 
     return None
