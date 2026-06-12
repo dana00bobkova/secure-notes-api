@@ -232,3 +232,17 @@ http://127.0.0.1:8000/docs
 ## Project Status
 
 This project is a portfolio security engineering project. It demonstrates secure API development, automated testing, audit logging, and DevSecOps practices in a small but complete application.
+
+## Evidence Screenshots
+
+This project includes evidence screenshots showing that the API, tests, coverage, audit logging, and DevSecOps pipeline are working.
+
+| Evidence | Screenshot |
+|---|---|
+| Swagger UI API documentation | `docs/evidence/swagger-ui.png` |
+| Local Pytest results | `docs/evidence/tests-passed.png` |
+| Test coverage report | `docs/evidence/coverage-report.png` |
+| GitHub Actions passing run | `docs/evidence/github-actions-green.png` |
+| CodeQL code scanning | `docs/evidence/codeql-scan.png` |
+| Dependabot monitoring | `docs/evidence/dependabot.png` |
+| Audit log database output | `docs/evidence/audit-logs.png` |
