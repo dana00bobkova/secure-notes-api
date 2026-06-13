@@ -42,6 +42,12 @@ def get_current_user(
 
     if user is None:
         raise credentials_exception
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is disabled."
+        )
 
     return user
 

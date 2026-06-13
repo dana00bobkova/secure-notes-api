@@ -9,6 +9,7 @@ from app.models.user import User
 from app.models.note import Note
 from app.models.audit_log import AuditLog
 
+from app.api.admin import admin_router
 
 app = FastAPI(
     title="Secure Notes API",
@@ -20,6 +21,7 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(notes_router, prefix="/notes", tags=["Notes"])
+app.include_router(admin_router, prefix="/admin", tags=["Admin"])
 
 
 @app.get("/")

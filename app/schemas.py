@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from datetime import datetime
 
 
 class UserCreate(BaseModel):
@@ -15,6 +16,7 @@ class UserRead(BaseModel):
     id: int
     email: EmailStr
     role: str
+    is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -38,5 +40,17 @@ class NoteRead(BaseModel):
     title: str
     content: str
     owner_id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class AuditLogRead(BaseModel):
+    id: int
+    event_type: str
+    user_id: int | None
+    email: str | None
+    success: bool
+    ip_address: str | None
+    details: str | None
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

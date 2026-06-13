@@ -111,6 +111,22 @@ def login_user(
             detail="Invalid email or password."
         )
 
+    if not user.is_active:
+        log_audit_event(
+            db=db,
+            event_type="LOGIN_FAILED",
+            success=False,
+            request=request,
+            user_id=user.id,
+            email=user.email,
+            details="Login failed because user account is disabled."
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password."
+        )
+
     access_token = create_access_token(
         data={
             "sub": str(user.id),
