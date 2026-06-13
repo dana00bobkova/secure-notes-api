@@ -167,15 +167,18 @@ def test_user_cannot_read_another_users_note(client, auth_headers):
         headers=auth_headers
     )
 
+    assert dana_note_response.status_code == 201
+
     dana_note_id = dana_note_response.json()["id"]
 
-    bob_email = "bob-read-unique@example.com"
+    bob_email = "bob-read-test@example.com"
+    bob_password = "Password123!"
 
     bob_register_response = client.post(
         "/auth/register",
         json={
             "email": bob_email,
-            "password": "Password123!"
+            "password": bob_password
         }
     )
 
@@ -185,7 +188,7 @@ def test_user_cannot_read_another_users_note(client, auth_headers):
         "/auth/login",
         json={
             "email": bob_email,
-            "password": "Password123!"
+            "password": bob_password
         }
     )
 
@@ -214,15 +217,18 @@ def test_user_cannot_update_another_users_note(client, auth_headers):
         headers=auth_headers
     )
 
+    assert dana_note_response.status_code == 201
+
     dana_note_id = dana_note_response.json()["id"]
 
-    bob_email = "bob-update-unique@example.com"
+    bob_email = "bob-update-test@example.com"
+    bob_password = "Password123!"
 
     bob_register_response = client.post(
         "/auth/register",
         json={
             "email": bob_email,
-            "password": "Password123!"
+            "password": bob_password
         }
     )
 
@@ -232,7 +238,7 @@ def test_user_cannot_update_another_users_note(client, auth_headers):
         "/auth/login",
         json={
             "email": bob_email,
-            "password": "Password123!"
+            "password": bob_password
         }
     )
 
@@ -265,15 +271,18 @@ def test_user_cannot_delete_another_users_note(client, auth_headers):
         headers=auth_headers
     )
 
+    assert dana_note_response.status_code == 201
+
     dana_note_id = dana_note_response.json()["id"]
 
-    bob_email = "bob-delete-unique@example.com"
+    bob_email = "bob-delete-test@example.com"
+    bob_password = "Password123!"
 
     bob_register_response = client.post(
         "/auth/register",
         json={
             "email": bob_email,
-            "password": "Password123!"
+            "password": bob_password
         }
     )
 
@@ -283,7 +292,7 @@ def test_user_cannot_delete_another_users_note(client, auth_headers):
         "/auth/login",
         json={
             "email": bob_email,
-            "password": "Password123!"
+            "password": bob_password
         }
     )
 
