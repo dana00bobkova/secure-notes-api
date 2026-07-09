@@ -11,7 +11,7 @@ The goal is to show that security was planned, built into the project, tested, a
 | Security Area                  | Risk or Misuse Case                                    | Control Used in This Project                                                               | How It Will Be Tested or Verified                                       |
 | ------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
 | Authentication                 | A user tries to access notes without logging in        | Require a valid authentication token for protected routes                                  | Test that unauthenticated requests return 401 Unauthorized              |
-| Authentication                 | A user tries to use a fake, expired, or modified token | Verify JWT tokens before allowing access                                                   | Test invalid and expired tokens                                         |
+| Authentication                 | A user tries to use a fake, expired, or modified token | Verify JWT tokens before allowing access                                                   | Test invalid, expired, and modified tokens                              |
 | Password Security              | Passwords are stolen from the database                 | Store password hashes instead of plain-text passwords                                      | Review code and test password verification                              |
 | Authorization                  | A user tries to view another user's note               | Check note ownership before returning a note                                               | Test that User A cannot access User B's note                            |
 | Authorization                  | A user tries to edit or delete another user's note     | Check note ownership before update or delete actions                                       | Test update and delete attempts against another user's note             |
@@ -21,10 +21,10 @@ The goal is to show that security was planned, built into the project, tested, a
 | Secure Configuration           | Secrets are accidentally uploaded to GitHub            | Store secrets in environment variables and exclude `.env` from Git                         | Confirm `.env` is in `.gitignore`                                       |
 | Error Handling                 | The API reveals sensitive system details in errors     | Return safe error messages to users                                                        | Test invalid requests and review responses                              |
 | Audit Logging                  | Important security events are not recorded             | Log login attempts, note creation, note updates, note deletion, and authorization failures | Review generated logs during testing                                    |
-| Rate Limiting                  | An attacker sends too many requests                    | Add rate limiting to sensitive routes                                                      | Test repeated login or note creation requests                           |
+| Rate Limiting                  | An attacker sends too many requests                    | Rate limit sensitive routes such as login and note creation                                | Test repeated login and note creation requests                          |
 | Dependency Security            | A Python package has a known security weakness         | Use pip-audit and Dependabot                                                               | Verify scans run in GitHub Actions                                      |
 | Static Code Analysis           | Code contains insecure patterns                        | Use Bandit, Semgrep, and CodeQL                                                            | Verify scanners run in CI                                               |
-| Software Supply Chain Security | Dependencies become outdated or vulnerable             | Lock dependency versions and enable Dependabot updates                                     | Review dependency update pull requests                                  |
+| Software Supply Chain Security | Dependencies become outdated or vulnerable             | Pin dependency versions and enable Dependabot updates                                      | Review dependency update pull requests                                  |
 | Logging and Monitoring         | Security problems are difficult to investigate         | Keep structured audit logs                                                                 | Review logs for user ID, action, result, and timestamp                  |
 
 ## OWASP Top 10:2025 Mapping
@@ -33,7 +33,7 @@ The goal is to show that security was planned, built into the project, tested, a
 | ------------------------------------------ | --------------------------------------------------------------------------- |
 | A01 Broken Access Control                  | Authentication, note ownership checks, and role-based access control        |
 | A02 Security Misconfiguration              | Environment variables, safe defaults, `.gitignore`, and documented setup    |
-| A03 Software Supply Chain Failures         | Dependency version locking, pip-audit, Dependabot, and GitHub Actions       |
+| A03 Software Supply Chain Failures         | Pinned dependencies, pip-audit, Dependabot, and GitHub Actions              |
 | A04 Cryptographic Failures                 | Password hashing and secure secret handling                                 |
 | A05 Injection                              | Input validation and safe ORM queries                                       |
 | A06 Insecure Design                        | Threat modeling, secure architecture documentation, and misuse-case testing |

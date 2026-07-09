@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import get_current_user
 from app.database import get_db
 from app.models import Note, User
+from app.rate_limit import note_create_rate_limiter
 from app.schemas import NoteCreate, NoteRead, NoteUpdate
 from app.services.audit_logger import log_audit_event
 
@@ -18,6 +19,7 @@ notes_router = APIRouter()
 def create_note(
     note_data: NoteCreate,
     request: Request,
+    _rate_limit: None = Depends(note_create_rate_limiter),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

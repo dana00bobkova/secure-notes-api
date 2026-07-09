@@ -65,7 +65,7 @@ The API must safely communicate with the database. It should avoid unsafe querie
 
 ### API to Dependencies
 
-The API relies on third-party Python packages. These packages may contain security weaknesses, so they should be locked to specific versions, scanned, and updated regularly.
+The API relies on third-party Python packages. These packages may contain security weaknesses, so they should be pinned to specific versions, scanned, and updated regularly.
 
 ## Common Attacker Goals
 
@@ -122,7 +122,7 @@ An attacker tries many passwords in a short period of time.
 
 **Security Control:**
 
-The API should use password hashing, safe error messages, and rate limiting.
+The API uses password hashing, safe error messages, and rate limiting.
 
 ### Misuse Case 6: Token Abuse
 

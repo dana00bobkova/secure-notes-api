@@ -5,6 +5,7 @@ from app.auth.dependencies import get_current_user
 from app.auth.security import create_access_token, hash_password, verify_password
 from app.database import get_db
 from app.models import User
+from app.rate_limit import login_rate_limiter
 from app.schemas import Token, UserCreate, UserLogin, UserRead
 from app.services.audit_logger import log_audit_event
 
@@ -72,6 +73,7 @@ def register_user(
 def login_user(
     login_data: UserLogin,
     request: Request,
+    _rate_limit: None = Depends(login_rate_limiter),
     db: Session = Depends(get_db)
 ):
     user = (

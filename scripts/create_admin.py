@@ -1,12 +1,20 @@
+from getpass import getpass
+
+from app.auth.security import hash_password
 from app.database import SessionLocal
 from app.models import User
-from app.auth.security import hash_password
 
 
 db = SessionLocal()
 
-admin_email = "admin_test@example.com"
-admin_password = "Password123!"
+admin_email = input("Admin email: ").strip()
+admin_password = getpass("Admin password: ")
+
+if not admin_email:
+    raise ValueError("Admin email is required.")
+
+if len(admin_password) < 8:
+    raise ValueError("Admin password must be at least 8 characters.")
 
 existing_admin = db.query(User).filter(User.email == admin_email).first()
 
@@ -27,4 +35,3 @@ db.commit()
 db.close()
 
 print("Admin email:", admin_email)
-print("Admin password:", admin_password)

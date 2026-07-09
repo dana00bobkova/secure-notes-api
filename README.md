@@ -24,6 +24,7 @@ The purpose of this project is to show how a basic web API can be designed with 
 * Private user notes
 * Create, read, update, and delete notes
 * Note ownership checks
+* Rate limiting on login and note creation
 * Role field support for future admin features
 * Input validation with Pydantic
 * Password hashing with bcrypt
@@ -32,6 +33,7 @@ The purpose of this project is to show how a basic web API can be designed with 
 * Test coverage reporting
 * GitHub Actions CI pipeline
 * Bandit Python security scanning
+* Semgrep static analysis
 * pip-audit dependency vulnerability scanning
 * CodeQL code scanning
 * Dependabot dependency update monitoring
@@ -69,6 +71,10 @@ The API records important security events, including:
 
 Audit logs include event type, user ID when available, email, success status, IP address, safe event details, and timestamp. Passwords, tokens, and private note contents are not stored in audit logs.
 
+### Rate Limiting
+
+Login and note creation routes use per-client rate limiting. Repeated requests receive `429 Too Many Requests`.
+
 ## DevSecOps Pipeline
 
 This project includes a GitHub Actions CI pipeline that automatically runs on pushes and pull requests.
@@ -79,6 +85,7 @@ The pipeline runs:
 * Test coverage reporting
 * Bandit security scan
 * pip-audit dependency scan
+* Semgrep security scan
 
 The project also includes CodeQL code scanning and Dependabot dependency monitoring.
 
@@ -103,6 +110,10 @@ Tests include:
 * User cannot read another user's note
 * User cannot update another user's note
 * User cannot delete another user's note
+* Invalid, expired, and modified token rejection
+* Long input and wrong data type rejection
+* Injection-style note content handled safely
+* Login and note creation rate limiting
 * Audit log creation for important events
 
 To run tests locally:
@@ -143,6 +154,7 @@ pip-audit -r requirements.txt
 * GitHub Actions
 * Bandit
 * pip-audit
+* Semgrep
 * CodeQL
 * Dependabot
 
@@ -223,8 +235,8 @@ http://127.0.0.1:8000/docs
 | Broken Access Control                    | Note ownership checks and protected routes              |
 | Cryptographic Failures                   | Password hashing and environment-based secret handling  |
 | Injection                                | Input validation and ORM queries                        |
+| Authentication Failures                  | JWT validation, expired token rejection, and rate limits |
 | Insecure Design                          | Misuse-case testing and secure architecture decisions   |
-| Authentication Failures                  | JWT validation and password verification                |
 | Software and Data Integrity Failures     | CI pipeline, dependency scanning, and Dependabot        |
 | Security Logging and Monitoring Failures | Audit logging for important security events             |
 | Security Misconfiguration                | `.env`, `.env.example`, and safe configuration handling |

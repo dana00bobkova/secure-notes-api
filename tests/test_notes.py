@@ -50,6 +50,66 @@ def test_create_note_rejects_empty_content(client, auth_headers):
     assert response.status_code == 422
 
 
+def test_create_note_rejects_long_title(client, auth_headers):
+    response = client.post(
+        "/notes/",
+        json={
+            "title": "A" * 101,
+            "content": "This title is too long."
+        },
+        headers=auth_headers
+    )
+
+    assert response.status_code == 422
+
+
+def test_create_note_rejects_long_content(client, auth_headers):
+    response = client.post(
+        "/notes/",
+        json={
+            "title": "Long Content",
+            "content": "A" * 5001
+        },
+        headers=auth_headers
+    )
+
+    assert response.status_code == 422
+
+
+def test_create_note_rejects_wrong_data_type(client, auth_headers):
+    response = client.post(
+        "/notes/",
+        json={
+            "title": ["not", "a", "string"],
+            "content": "This should fail validation."
+        },
+        headers=auth_headers
+    )
+
+    assert response.status_code == 422
+
+
+def test_sql_like_note_content_is_stored_as_text(client, auth_headers):
+    payload = "'; DROP TABLE notes; --"
+
+    create_response = client.post(
+        "/notes/",
+        json={
+            "title": "Injection Payload Test",
+            "content": payload
+        },
+        headers=auth_headers
+    )
+
+    assert create_response.status_code == 201
+    assert create_response.json()["content"] == payload
+
+    list_response = client.get("/notes/", headers=auth_headers)
+
+    assert list_response.status_code == 200
+    assert list_response.json()[0]["content"] == payload
+
+
 def test_list_notes_returns_current_users_notes(client, auth_headers):
     client.post(
         "/notes/",

@@ -1,3 +1,10 @@
+from datetime import datetime, timedelta, timezone
+
+import jwt
+
+from app.auth.security import ALGORITHM, SECRET_KEY
+
+
 def test_health_check(client):
     response = client.get("/health")
 
@@ -98,3 +105,44 @@ def test_auth_me_returns_current_user(client, auth_headers):
     assert body["email"] == "dana@example.com"
     assert body["role"] == "user"
     assert "id" in body
+
+
+def test_auth_me_rejects_invalid_token(client):
+    response = client.get(
+        "/auth/me",
+        headers={"Authorization": "Bearer not-a-valid-token"}
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Could not validate credentials."
+
+
+def test_auth_me_rejects_expired_token(client):
+    expired_token = jwt.encode(
+        {
+            "sub": "1",
+            "exp": datetime.now(timezone.utc) - timedelta(minutes=1)
+        },
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+
+    response = client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {expired_token}"}
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Could not validate credentials."
+
+
+def test_auth_me_rejects_modified_token(client, auth_headers):
+    modified_token = f"{auth_headers['Authorization'].removeprefix('Bearer ')}changed"
+
+    response = client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {modified_token}"}
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Could not validate credentials."

@@ -42,8 +42,12 @@ jobs:
 
       - name: Run Bandit security scan
         run: |
-          bandit -r app || true
+          bandit -r app
 
       - name: Run pip-audit dependency scan
         run: |
-          pip-audit -r requirements.txt || true
+          pip-audit -r requirements.txt
+
+      - name: Run Semgrep security scan
+        run: |
+          semgrep scan --config p/python --error

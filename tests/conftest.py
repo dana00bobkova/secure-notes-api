@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, get_db
 from app.main import app
+from app.rate_limit import reset_rate_limits
 
 # These imports make sure SQLAlchemy knows about all database tables during tests.
 from app.models.user import User
@@ -28,6 +29,7 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture()
 def db_session():
+    reset_rate_limits()
     Base.metadata.drop_all(bind=test_engine)
     Base.metadata.create_all(bind=test_engine)
 
