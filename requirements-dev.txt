@@ -5,4 +5,4 @@ pytest-cov==7.1.0
 httpx==0.28.1
 bandit==1.9.4
 pip-audit==2.10.1
-semgrep==1.166.0
+semgrep==1.168.0
